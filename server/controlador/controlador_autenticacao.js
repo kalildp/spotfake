@@ -2,6 +2,7 @@ import { User } from '../db.js'
 import bcryptjs from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
+
 const registro = async (req, res) => {
     // verificar se todos os campos foram enviados
     try {

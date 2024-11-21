@@ -19,6 +19,7 @@ const Cadastro = () => {
             return;
         }
 
+        
         if (senha !== confirmarSenha) {
             alert('As senhas não coincidem');
             return;
