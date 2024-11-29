@@ -10,11 +10,11 @@ import { useRouter } from "expo-router";
 const Perfil = () => {
     const { userInfo, setUserInfo, handleDisconnect } = useContext(UserContext);
     const route = useRouter();
-    const [modalVisible, setModalVisible] = useState(false);
+    const [visibilidadeModal, setVisibilidadeModal] = useState(false);
     const [novaSenha, setNovaSenha] = useState('');
     const [corfirmarSenha, setCorfirmarSenha] = useState('');
 
-    const getImage = async () => {
+    const pegarImagem = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.mediaTypes,
             allowsEditing: true,
@@ -22,11 +22,12 @@ const Perfil = () => {
             quality: 1,
         });
         if (!result.canceled) {
-            handleSetImage(result.assets[0].uri);
+            setUserInfo({ ...userInfo, foto: result.assets[0].uri })
+            salvarCloudinary(result.assets[0].uri);
         }
     };
 
-    const handleSetImage = async (url) => {
+    const salvarCloudinary = async (url) => {
         try {
             const data = {
                 "file": url,
@@ -67,10 +68,10 @@ const Perfil = () => {
     const fecharModal = () => {
         setNovaSenha('')
         setCorfirmarSenha('')
-        setModalVisible(false);
+        setVisibilidadeModal(false);
     }
 
-    const handleChangePassword = async () => {
+    const lidarComNovaSenha = async () => {
         if(novaSenha.length < 3) {
             alert('A senha deve ter no minimo 3 caracteres')
             return
@@ -103,7 +104,7 @@ const Perfil = () => {
             <TopBar icon1={<Pressable onPress={() => route.back()}>
                 <Ionicons name="chevron-back" size={28} color="white" />
             </Pressable>} />
-            <Pressable onPress={getImage}>
+            <Pressable onPress={pegarImagem}>
                 <Image
                     source={userInfo.foto}
                     style={styles.image}
@@ -111,17 +112,31 @@ const Perfil = () => {
             </Pressable>
             <Text style={styles.name}> {userInfo.nome} </Text>
             <Text style={styles.email}> {userInfo.email} </Text>
-            <TouchableOpacity style={styles.button} activeOpacity={0.8} onPress={() => setModalVisible(true)}>
+            <TouchableOpacity style={styles.button} activeOpacity={0.8} onPress={() => setVisibilidadeModal(true)}>
                 <Text style={styles.buttonText}>Mudar Senha</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.button} activeOpacity={0.8} onPress={handleDisconnect}>
                 <Text style={styles.buttonText}>Sair da Conta</Text>
             </TouchableOpacity>
+            <View style={styles.bottomNav}>
+        <TouchableOpacity style={styles.navItem}>
+            <Ionicons name="home" size={24} color="green" />
+            <Text style={styles.navText}>Início</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navItem}>
+            <Ionicons name="search" size={24} color="#fff" />
+            <Text style={styles.navText}>Buscar</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navItem}>
+            <Ionicons name="library" size={24} color="#fff" />
+            <Text style={styles.navText}>Biblioteca</Text>
+        </TouchableOpacity>
+    </View>
             <Modal
                 animationType='fade'
                 transparent={true}
-                visible={modalVisible}
-                onRequestClose={() => setModalVisible(false)}
+                visible={visibilidadeModal}
+                onRequestClose={() => setVisibilidadeModal(false)}
             >
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalContent}>
@@ -140,7 +155,7 @@ const Perfil = () => {
                             value={corfirmarSenha}
                             onChangeText={setCorfirmarSenha}
                         />
-                        <TouchableOpacity style={styles.modalButton} onPress={handleChangePassword}>
+                        <TouchableOpacity style={styles.modalButton} onPress={lidarComNovaSenha}>
                             <Text style={styles.modalButtonText}>Confirmar</Text>
                         </TouchableOpacity>
                         <Pressable style={styles.modalButtonCancel} onPress={fecharModal}>
@@ -259,6 +274,27 @@ const styles = StyleSheet.create({
         color: "green",
         fontSize: 16,
         fontWeight: "bold",
+    },
+    bottomNav: {
+        position: 'absolute',
+        bottom: 0,
+        width: '100%',
+        height: 60,
+        backgroundColor: '#1e1e1e',
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        borderTopWidth: 1,
+        borderTopColor: '#373737',
+    },
+    navItem: {
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    navText: {
+        color: '#fff',
+        fontSize: 12,
+        marginTop: 4,
     },
 });
 
